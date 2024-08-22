@@ -1,0 +1,4 @@
+(executable
+ (public_name test_opam_stubs)
+ (name main)
+ (libraries hello))

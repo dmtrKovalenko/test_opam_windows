@@ -1,0 +1,35 @@
+name: Build
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    continue-on-error: true
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            ocaml-compiler: "5.2.0"
+          - os: windows-latest
+            ocaml-compiler: "5.2.0"
+          - os: windows-latest
+            ocaml-compiler: "arch-x86_64,system-mingw,ocaml.5.2.0"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v2.3.2
+      - run: gcc --version
+
+      - uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: ${{ matrix.ocaml-compiler }}
+          opam-disable-sandboxing: true
+          dune-cache: false
+
+      - run: opam exec -- opam install . --deps-only
+      - name: Install deps & build
+        run: opam exec -- dune build --verbose
+
+      - run: opam exec -- dune exec test_opam_stubs
